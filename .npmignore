@@ -1,4 +1,5 @@
-src/
-tests/
+*.internal.md
+test_ipwho.mjs
 tsconfig.json
-vitest.config.ts
+tests/
+coverage/

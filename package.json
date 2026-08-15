@@ -1,56 +1,42 @@
 {
   "name": "@ipwho/ipwho",
-  "version": "1.0.5",
-  "description": "SDK for IPWho API",
-  "keywords": [
-    "geoip lookup",
-    "geoip api",
-    "ip location api",
-    "ip location",
-    "ip lookup",
-    "typescript sdk",
-    "ipgeolocation typescript sdk",
-    "ipgeolocation sdk",
-    "ipgeolocation-sdk-ts",
-    "geolocation",
-    "ipgeo",
-    "ip2geo",
-    "lookup",
-    "address",
-    "ip",
-    "freeipapi",
-    "free ip api",
-    "ipapicom",
-    "ip2location",
-    "ip-lookup",
-    "proxy-detection",
-    "api",
-    "geolocation-api",
-    "geolocation-application",
-    "geolocation-data",
-    "geolocation-plugin",
-    "ip geolocation",
-    "ip-geo",
-    "ip-geolocation",
-    "ip-geolocation-api",
-    "ip to country",
-    "ip to latitude",
-    "ip to longitude",
-    "geoip",
-    "ipapi",
-    "ip-lookup"
+  "version": "2.0.0",
+  "description": "Official TypeScript/JavaScript SDK for the IPWho IP geolocation API (lookup, me, bulk).",
+  "type": "module",
+  "main": "./src/ipwho.js",
+  "types": "./src/ipwho.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/ipwho.d.ts",
+      "import": "./src/ipwho.js"
+    }
+  },
+  "files": [
+    "src/ipwho.js",
+    "src/ipwho.d.ts",
+    "LICENSE",
+    "README.md"
   ],
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --minify --dts",
-    "test": "vitest run"
+  "homepage": "https://www.ipwho.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lavrox/SDK-IPWho-IP-Geolocation-Typescript.git"
   },
-  "devDependencies": {
-    "@types/node": "^25.2.1",
-    "tsup": "^8.5.1",
-    "typescript": "^5.0.0",
-    "vitest": "^1.0.0"
-  }
+  "bugs": {
+    "url": "https://github.com/lavrox/SDK-IPWho-IP-Geolocation-Typescript/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "ipwho",
+    "ip geolocation",
+    "geoip",
+    "ip lookup",
+    "typescript sdk"
+  ]
 }

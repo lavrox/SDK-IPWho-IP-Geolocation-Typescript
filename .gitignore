@@ -1,1 +1,28 @@
-/vendor/
+# Internal maintainer docs (do not publish)
+*.internal.md
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build
+dist/
+build/
+coverage/
+.nyc_output/
+
+# Env and logs
+.env
+.env.*
+*.log
+npm-debug.log*
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
