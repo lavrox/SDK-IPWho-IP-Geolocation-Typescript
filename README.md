@@ -1,6 +1,6 @@
 # IPWho ([ipwho.org](https://www.ipwho.org)) TypeScript SDK
 
-[![npm version](https://img.shields.io/npm/v/@ipwho/ipwho?style=flat-square)](https://www.npmjs.com/package/@ipwho/ipwho) [![license](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/lavrox/SDK-IPWho-Typescript/blob/main/LICENSE)
+[![npm version](https://img.shields.io/npm/v/@ipwho/ipwho?style=flat-square)](https://www.npmjs.com/package/@ipwho/ipwho) [![license](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/lavrox/SDK-IPWho-IP-Geolocation-Typescript/blob/main/LICENSE)
 
 Official TypeScript / Node.js client for the [IPWho](https://www.ipwho.org) IP Geolocation API. One call returns the **full** payload for an IPv4 or IPv6 address: geolocation, timezone, flag, currency, connection (ASN/ISP), security (VPN/Tor/threat), and user-agent when the API includes it.
 
@@ -8,6 +8,8 @@ Official TypeScript / Node.js client for the [IPWho](https://www.ipwho.org) IP G
 - API docs: [ipwho.org/docs](https://www.ipwho.org/docs)
 - Get an API key: [ipwho.org/free-plan](https://www.ipwho.org/free-plan) (free [Lavrox](https://lavrox.com) account)
 - Live API host: `https://api.ipwho.org`
+
+Topics: ip-geolocation, geoip, ip-lookup, typescript, nodejs, ipv4, ipv6, asn, ipwho
 
 ## API key
 
@@ -310,7 +312,7 @@ MIT License — see [LICENSE](LICENSE).
 
 - Documentation: [ipwho.org/docs](https://www.ipwho.org/docs)
 - Contact: [ipwho.org/contact](https://www.ipwho.org/contact)
-- GitHub Issues: [lavrox/SDK-IPWho-Typescript](https://github.com/lavrox/SDK-IPWho-Typescript/issues)
+- GitHub Issues: [lavrox/SDK-IPWho-IP-Geolocation-Typescript](https://github.com/lavrox/SDK-IPWho-IP-Geolocation-Typescript/issues)
 - Website: [ipwho.org](https://www.ipwho.org)
 
 ---
