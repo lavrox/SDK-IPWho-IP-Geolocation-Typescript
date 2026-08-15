@@ -1,15 +1,13 @@
 # IPWho ([ipwho.org](https://www.ipwho.org)) TypeScript SDK
 
-[![npm version](https://img.shields.io/npm/v/@ipwho/ipwho?style=flat-square)](https://www.npmjs.com/package/@ipwho/ipwho) [![license](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/lavrox/SDK-IPWho-IP-Geolocation-Typescript/blob/main/LICENSE)
+[![npm version](https://img.shields.io/npm/v/@ipwho/ipwho?style=flat-square)](https://www.npmjs.com/package/@ipwho/ipwho) [![npm downloads](https://img.shields.io/npm/dm/@ipwho/ipwho?style=flat-square)](https://www.npmjs.com/package/@ipwho/ipwho) [![license](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/lavrox/SDK-IPWho-IP-Geolocation-Typescript/blob/main/LICENSE)
 
-Official TypeScript / Node.js client for the [IPWho](https://www.ipwho.org) IP Geolocation API. One call returns the **full** payload for an IPv4 or IPv6 address: geolocation, timezone, flag, currency, connection (ASN/ISP), security (VPN/Tor/threat), and user-agent when the API includes it.
+Official TypeScript / Node.js SDK for the [IPWho](https://www.ipwho.org) **IP geolocation API** — geoip lookup, IP location, IP to country / latitude / longitude, ASN/ISP, timezone, currency, flag, and proxy/VPN detection with typed responses. Works as an IP lookup / ip-geolocation client for IPv4 and IPv6 (`lookup`, `me`, `bulk`).
 
 - Product: [ipwho.org](https://www.ipwho.org)
 - API docs: [ipwho.org/docs](https://www.ipwho.org/docs)
 - Get an API key: [ipwho.org/free-plan](https://www.ipwho.org/free-plan) (free [Lavrox](https://lavrox.com) account)
 - Live API host: `https://api.ipwho.org`
-
-Topics: ip-geolocation, geoip, ip-lookup, typescript, nodejs, ipv4, ipv6, asn, ipwho
 
 ## API key
 
