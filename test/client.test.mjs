@@ -118,3 +118,17 @@ test('a connection failure throws APIResponseError without the key', async () =>
     return true;
   });
 });
+
+test('a key with surrounding whitespace is trimmed', async () => {
+  const padded = new IPWhoClient(`  ${KEY}\n`, { baseUrl: `http://127.0.0.1:${server.address().port}` });
+  await padded.lookup('8.8.8.8');
+  assert.equal(requests[0].headers.authorization, `Bearer ${KEY}`);
+});
+
+test('a key with invalid characters is rejected without repeating it', () => {
+  assert.throws(() => new IPWhoClient('sk.secret_part\nmore'), (err) => {
+    assert.ok(!err.message.includes('secret_part'), err.message);
+    return true;
+  });
+  assert.throws(() => new IPWhoClient('  \n'), /apiKey is required/);
+});

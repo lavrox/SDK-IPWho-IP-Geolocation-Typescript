@@ -410,10 +410,16 @@ export class IPWhoClient {
    * @param {number}  [options.timeout] - Request timeout in ms (default 30000).
    */
   constructor(apiKey, options = {}) {
-    if (!apiKey) {
+    const key = typeof apiKey === 'string' ? apiKey.trim() : '';
+    if (!key) {
       throw new IPWhoError('apiKey is required');
     }
-    this.#apiKey = apiKey;
+    // The key is sent in a header. Reject it here, without repeating it, rather
+    // than let the HTTP client quote it in an error message.
+    if (/[^\x20-\x7e]/.test(key)) {
+      throw new IPWhoError('apiKey contains characters that are not allowed');
+    }
+    this.#apiKey = key;
     this.#baseUrl = (options.baseUrl || IPWhoClient.DEFAULT_BASE_URL).replace(/\/+$/, '');
     this.#timeout = options.timeout ?? 30000;
   }
