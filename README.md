@@ -23,7 +23,7 @@ npm install @ipwho/ipwho
 yarn add @ipwho/ipwho
 ```
 
-Requires Node.js 18+ (native `fetch`) or a modern browser.
+Requires Node.js 18+ (native `fetch`). It has no dependencies. The package is an ES module, so your project needs `"type": "module"` or `.mjs` files. It can't be called from a web page on another website: the API only accepts browser requests from its own sites.
 
 ## Quick Start
 
@@ -55,6 +55,8 @@ IpGeoResponse
     └── responseArray?: IpGeoResponse[]   // bulk only
 ```
 
+The client sends your API key in the `Authorization` header, so it isn't part of the request URL.
+
 ## Reading the full response (8.8.8.8)
 
 Live [IPWho](https://www.ipwho.org) values for Google DNS: country United States, ASN 15169, timezone America/Chicago, dial code +1. Nested objects may be `null` — check before use.
@@ -80,9 +82,8 @@ console.log(tz.abbr, tz.offset, tz.isDst, tz.utc, tz.currentTime);
 console.log(data.flag.flagIcon);    // "🇺🇸"
 console.log(data.flag.flagUnicode); // "U+1F1FA U+1F1F8"
 
-console.log(data.currency.code, data.currency.symbol, data.currency.name);
-console.log(data.currency.namePlural); // "US dollars"
-console.log(data.currency.hexUnicode);
+console.log(data.currency?.code, data.currency?.symbol, data.currency?.name);
+console.log(data.currency?.namePlural); // "US dollars"
 
 const conn = data.connection;
 console.log(conn.asnNumber);      // 15169
@@ -101,12 +102,18 @@ const me = await client.me();
 console.log(me.data.ip);
 
 const bulk = await client.bulk(['8.8.8.8', '1.1.1.1']);
-for (const item of bulk.data.responseArray) {
-  console.log(item.data.ip, item.data.geoLocation.country);
+for (const row of bulk.data.responseArray) {
+  if (row.success) {
+    console.log(row.data.ip, row.data.geoLocation.country);
+  } else {
+    console.log(row.data.ip, row.message);
+  }
 }
 ```
 
 ### Example JSON (mapped fields)
+
+Shortened. Values such as the time change between requests.
 
 ```json
 {
@@ -119,8 +126,8 @@ for (const item of bulk.data.responseArray) {
       "country": "United States",
       "countryCode": "US",
       "capital": "Washington",
-      "region": "California",
-      "regionCode": "CA",
+      "region": null,
+      "regionCode": null,
       "city": null,
       "postalCode": null,
       "dialCode": "+1",
@@ -131,52 +138,43 @@ for (const item of bulk.data.responseArray) {
     },
     "timezone": {
       "timeZone": "America/Chicago",
-      "abbr": "CDT",
-      "offset": -18000,
-      "isDst": true,
-      "utc": "UTC-05:00",
-      "currentTime": "2026-08-07T12:00:00-05:00"
+      "abbr": "CST",
+      "offset": -21600,
+      "isDst": false,
+      "utc": "-06:00",
+      "currentTime": "2026-11-26T08:10:50-06:00"
     },
     "flag": { "flagIcon": "🇺🇸", "flagUnicode": "U+1F1FA U+1F1F8" },
-    "currency": {
-      "code": "USD",
-      "symbol": "$",
-      "name": "US Dollar",
-      "namePlural": "US dollars",
-      "hexUnicode": "0024"
-    },
+    "currency": { "code": "USD", "symbol": "$", "name": "US Dollar", "namePlural": "US dollars" },
     "connection": {
       "asnNumber": 15169,
       "asnOrg": "Google LLC",
-      "isp": "Google LLC",
-      "org": "Google LLC",
-      "domain": "google.com",
+      "isp": "Google",
+      "org": "Google",
+      "domain": null,
       "connectionType": "Corporate"
     },
-    "security": { "isVpn": false, "isTor": false, "isThreat": "low" },
-    "userAgent": null
+    "security": { "isVpn": false, "isTor": false, "isThreat": "low" }
   }
 }
 ```
 
-Anycast DNS IPs may omit city. Country, ASN, timezone, flag, and currency are populated.
+Fields can be `null`. For example, `currency` and the country fields are `null` for `1.1.1.1`.
 
 ## Migrating from v1
 
 | v1 | v2 |
 |----|----|
-| `getIp(ip)` / `getLocation(ip)` | `lookup(ip)` then `res.data.geoLocation` |
-| `getMe()` / `getLocation()` | `me()` |
-| `getTimezone` / `getConnection` / `getSecurity` | nested on `lookup(ip).data` |
-| *(missing)* | `bulk(ips)` |
-
-Client class is `IPWhoClient` (was `IPWho`).
+| `new IPWho(key)` | `new IPWhoClient(key)` |
+| `getIp(ip)` (returned the data object) | `lookup(ip)`, then `res.data` |
+| `getMe()` | `me()` |
+| `require` or `import` | `import` only (ES module) |
 
 ## API Reference
 
 ### `new IPWhoClient(apiKey, options?)`
 
-- **apiKey**: [IPWho](https://www.ipwho.org) key (query `apiKey`). Required.
+- **apiKey**: [IPWho](https://www.ipwho.org) key, sent as `Authorization: Bearer`. Required.
 - **options.baseUrl**: default `https://api.ipwho.org`.
 - **options.timeout**: milliseconds (default `30000`).
 - **Throws**: `IPWhoError` if the key is empty.
@@ -191,7 +189,7 @@ Client class is `IPWhoClient` (was `IPWho`).
 
 ### `bulk(ips): Promise<IpGeoResponse>`
 
-`GET /bulk/{a,b,c}`. Results: `data.responseArray`.
+`GET /bulk/{a,b,c}`. Results: `data.responseArray`, one `IpGeoResponse` per address. Check each row's `success`. A failed row has a `message`, and its `data` holds only the `ip`.
 
 ### Errors
 
@@ -283,17 +281,21 @@ The wire JSON mixes casings (`postal_Code`, `flag_Icon`, `isVpn`). The client no
 ## Troubleshooting
 
 - **Missing API key**: [ipwho.org](https://www.ipwho.org).
-- **HTTP 403**: blank User-Agent is rejected. SDK sends `ipwho-js-sdk/1.0.0`.
+- HTTP 403: your key or plan doesn't allow the request, or it was blocked before reaching the API because of its `User-Agent`. The SDK sends `ipwho-js-sdk/1.0.0`.
 - **HTTP 429 / 404**: `RateLimitError` / `InvalidIPError`.
 - **Null fields**: city and user-agent are often empty on infrastructure IPs.
 
 ## Testing
 
 ```bash
-IPWHO_API_KEY=your_key node test_ipwho.mjs
+npm test
 ```
 
-The live check is `test_ipwho.mjs`.
+`npm test` needs no API key: it runs against a local stand-in server. For a live check, which uses lookups from your quota:
+
+```bash
+IPWHO_API_KEY=your_key node test_ipwho.mjs
+```
 
 ## Changelog
 
