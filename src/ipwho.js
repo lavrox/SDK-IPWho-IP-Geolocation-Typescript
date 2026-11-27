@@ -3,7 +3,8 @@
  * ==============================================
  *
  * Enterprise-grade IP Geolocation API client.
- * ESM with JSDoc types. Works in Node.js 18+ and modern browsers.
+ * ESM with JSDoc types. For Node.js 18+. The API sends no CORS headers, so it
+ * can't be called from a web page on another site.
  *
  * Endpoints:
  *   - lookup(ip)   — geolocation for a specific IPv4/IPv6 address
@@ -342,15 +343,29 @@ function toIpGeoResponse(payload) {
 }
 
 /**
+ * Build one bulk result. The API sends bulk rows flat:
+ * `{ success, ip, geoLocation, ... }`, or `{ success: false, ip, message }`.
+ * @param {object} row
+ * @returns {IpGeoResponse}
+ */
+function toBulkRow(row) {
+  return {
+    success: row.success ?? false,
+    data: toGeoData(row),
+    message: row.message ?? null,
+  };
+}
+
+/**
  * Build query parameters for lookup / me endpoints.
- * @param {string} apiKey
+ * The API key is not a query parameter: it is sent in a request header.
  * @param {string} format
  * @param {string|null} fields
  * @returns {Record<string,string>}
  */
-function buildParams(apiKey, format, fields) {
+function buildParams(format, fields) {
   /** @type {Record<string,string>} */
-  const params = { apiKey };
+  const params = {};
   if (format !== 'json') {
     params.format = format;
   }
@@ -420,7 +435,7 @@ export class IPWhoClient {
   async lookup(ip, options = {}) {
     const format = options.format || 'json';
     const fields = Array.isArray(options.fields) ? options.fields.join(',') : (options.fields || null);
-    const params = buildParams(this.#apiKey, format, fields);
+    const params = buildParams(format, fields);
     return this.#get(`/ip/${encodeURIComponent(ip)}`, params, format);
   }
 
@@ -436,7 +451,7 @@ export class IPWhoClient {
   async me(options = {}) {
     const format = options.format || 'json';
     const fields = Array.isArray(options.fields) ? options.fields.join(',') : (options.fields || null);
-    const params = buildParams(this.#apiKey, format, fields);
+    const params = buildParams(format, fields);
     return this.#get('/me', params, format);
   }
 
@@ -444,7 +459,9 @@ export class IPWhoClient {
    * Batch-lookup multiple IP addresses.
    *
    * @param {string[]} ips - List of IPv4 or IPv6 addresses.
-   * @returns {Promise<IpGeoResponse>}  Response with `data.responseArray` of `GeoData`.
+   * @returns {Promise<IpGeoResponse>}  Response with `data.responseArray`: one
+   *   `IpGeoResponse` per address. Check each row's `success`; a failed row has
+   *   a `message`, and its `data` holds only the `ip`.
    * @throws {APIResponseError}
    */
   async bulk(ips) {
@@ -452,8 +469,7 @@ export class IPWhoClient {
       throw new IPWhoError('ips must not be empty');
     }
     const bulkParam = ips.join(',');
-    const params = { apiKey: this.#apiKey };
-    return this.#get(`/bulk/${encodeURIComponent(bulkParam)}`, params, 'json');
+    return this.#get(`/bulk/${encodeURIComponent(bulkParam)}`, {}, 'json');
   }
 
   // ── internal ────────────────────────────────────────────────────
@@ -473,19 +489,21 @@ export class IPWhoClient {
 
     /** @type {Response} */
     let response;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.#timeout);
     try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), this.#timeout);
       response = await fetch(url.toString(), {
         signal: controller.signal,
         headers: {
           Accept: 'application/json',
+          Authorization: `Bearer ${this.#apiKey}`,
           'User-Agent': 'ipwho-js-sdk/1.0.0',
         },
       });
-      clearTimeout(timer);
     } catch (err) {
       throw new APIResponseError(`Request failed: ${err.message}`);
+    } finally {
+      clearTimeout(timer);
     }
 
     // Rate limit
@@ -539,9 +557,7 @@ export class IPWhoClient {
 
     // Bulk response: data contains responseArray
     if (payload.data && Array.isArray(payload.data.responseArray)) {
-      payload.data.responseArray = payload.data.responseArray.map(
-        (item) => toIpGeoResponse(item)
-      );
+      payload.data.responseArray = payload.data.responseArray.map(toBulkRow);
     }
 
     return toIpGeoResponse(payload);
