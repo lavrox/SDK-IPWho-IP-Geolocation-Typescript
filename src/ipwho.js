@@ -3,8 +3,8 @@
  * ==============================================
  *
  * Enterprise-grade IP Geolocation API client.
- * ESM with JSDoc types. For Node.js 18+. The API sends no CORS headers, so it
- * can't be called from a web page on another site.
+ * ESM with JSDoc types. For Node.js 18+. It can't be called from a web page on
+ * another website: the API only accepts browser requests from its own sites.
  *
  * Endpoints:
  *   - lookup(ip)   — geolocation for a specific IPv4/IPv6 address
@@ -383,7 +383,8 @@ function buildParams(format, fields) {
 async function errorMessage(response) {
   try {
     const body = await response.json();
-    return body.message || response.statusText;
+    // Auth errors carry a code in `error` and no `message`.
+    return body.message || body.error || response.statusText;
   } catch {
     return response.statusText || `HTTP ${response.status}`;
   }

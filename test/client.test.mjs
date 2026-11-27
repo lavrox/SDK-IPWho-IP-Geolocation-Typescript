@@ -105,6 +105,7 @@ for (const [status, body, type] of [
     await assert.rejects(client.lookup('8.8.8.8'), (err) => {
       assert.ok(err instanceof type, err.constructor.name);
       assert.ok(!err.message.includes(KEY));
+      if (status === 401) assert.match(err.message, /invalid_api_key/);
       return true;
     });
   });

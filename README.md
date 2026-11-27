@@ -23,7 +23,7 @@ npm install @ipwho/ipwho
 yarn add @ipwho/ipwho
 ```
 
-Requires Node.js 18+ (native `fetch`). It has no dependencies. The package is an ES module, so your project needs `"type": "module"` or `.mjs` files. It can't be called from a web page on another site, because the API sends no CORS headers.
+Requires Node.js 18+ (native `fetch`). It has no dependencies. The package is an ES module, so your project needs `"type": "module"` or `.mjs` files. It can't be called from a web page on another website: the API only accepts browser requests from its own sites.
 
 ## Quick Start
 
@@ -281,7 +281,7 @@ The wire JSON mixes casings (`postal_Code`, `flag_Icon`, `isVpn`). The client no
 ## Troubleshooting
 
 - **Missing API key**: [ipwho.org](https://www.ipwho.org).
-- **HTTP 403**: blank User-Agent is rejected. SDK sends `ipwho-js-sdk/1.0.0`.
+- HTTP 403: your key or plan doesn't allow the request, or it was blocked before reaching the API because of its `User-Agent`. The SDK sends `ipwho-js-sdk/1.0.0`.
 - **HTTP 429 / 404**: `RateLimitError` / `InvalidIPError`.
 - **Null fields**: city and user-agent are often empty on infrastructure IPs.
 
